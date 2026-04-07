@@ -30,7 +30,7 @@ createServer((request, response) => { //pulled from lecture slides
 //end of code to bypass CORS
     let handler = methods[request.method] || notAllowed;
     handler(request)
-    .catch(error => {
+    .catch(error => { //if an error is caught, returns error code 500
         if (error.status != null) return error;
         return {body: String(error), status: 500};
     })
@@ -44,7 +44,7 @@ createServer((request, response) => { //pulled from lecture slides
 const {parse} = require("url");
 const {resolve, sep} = require("path");
 const baseDirectory = process.cwd();
-function urlPath(url) { //pulled from lecture slides
+function urlPath(url) { //pulled from lecture slides, takes path name, removes escape codes, and resolves to cwd
     let {pathname} = parse(url);
     let path =
     resolve(decodeURIComponent(pathname).slice(1));
@@ -66,16 +66,16 @@ methods.GET = async function(request){ //pulled from lecture slides
     let path = urlPath(request.url);
     let stats;
     try {
-        stats = await stat(path);
+        stats = await stat(path); //gathers info about the path trying to access
     } catch (error) {
-        if (error.code != "ENOENT") throw error;
-        else return {status: 404, body: "File not found"};
+        if (error.code != "ENOENT") throw error; //throws error if the error isnt ENONET
+        else return {status: 404, body: "File not found"}; //throws 404 error if error is ENONET
     }
     if (stats.isDirectory()) {
-        return {body: (await readdir(path)).join("\n")};
+        return {body: (await readdir(path)).join("\n")}; //returns list of files when reading from directory
     } else {
-        return {body: createReadStream(path),
-            type: mime.getType(path)};
+        return {body: createReadStream(path), //returns file's contents
+            type: mime.getType(path)}; //gets file type from mime
     }
 };
 
